@@ -17,23 +17,24 @@ async def health():
 
 class ChatIn(BaseModel):
     session_id: str
+    user_id: str
     message: str
-    include_audio: bool = False
 
 
 @app.post("/chat")
 async def chat(body: ChatIn):
-    reply = await run_agent(body.session_id, body.message)
-    if not body.include_audio:
-        return {"reply": reply}
-    audio = await tts(reply)
-    return {"reply": reply, "audio": base64.b64encode(audio).decode("ascii")}
+    return {"reply": await run_agent(body.session_id, body.user_id, body.message)}
+
 
 
 @app.post("/voice")
-async def voice(session_id: str = Form(...), audio: UploadFile = File(...)):
+async def voice(
+    session_id: str = Form(...),
+    user_id: str = Form(...),
+    audio: UploadFile = File(...),
+):
     text = await stt(await audio.read(), audio.filename or "audio.webm")
-    reply = await run_agent(session_id, text)
+    reply = await run_agent(session_id, user_id, text)
     return Response(await tts(reply), media_type="audio/mpeg")
 
 

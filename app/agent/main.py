@@ -8,6 +8,8 @@ from pydantic_ai.messages import ModelMessage, ModelRequest, UserPromptPart
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
+from .composio_config import get_mcp
+
 load_dotenv()
 
 MAX_MESSAGES = 30
@@ -33,7 +35,7 @@ model = OpenAIChatModel(
 agent = Agent(
     model,
     deps_type=Session,
-    system_prompt="You are a helpful voice assistant. Keep replies short and conversational.",
+    system_prompt="You are a helpful voice assistant. Keep replies short and conversational. Always confirm with the user before sending or deleting any email.",
 )
 
 
@@ -66,8 +68,13 @@ def trim(history: list[ModelMessage]) -> list[ModelMessage]:
     return history
 
 
-async def run_agent(session_id: str, text: str) -> str:
+async def run_agent(session_id: str, user_id: str, text: str) -> str:
     session = sessions.setdefault(session_id, Session())
-    result = await agent.run(text, deps=session, message_history=session.history)
+    result = await agent.run(
+        text,
+        deps=session,
+        message_history=session.history,
+        toolsets=[get_mcp(user_id)],
+    )
     session.history = trim(result.all_messages())
     return result.output
