@@ -1,10 +1,9 @@
 import os
-
 from composio import Composio
 from dotenv import load_dotenv
 from pydantic_ai.mcp import MCPToolset
 
-load_dotenv(override=True)
+load_dotenv()
 
 TOOLKITS = ["gmail"]
 
@@ -12,7 +11,7 @@ composio = Composio(api_key=os.environ["COMPOSIO_API_KEY"])
 cache: dict[str, MCPToolset] = {}
 
 
-def get_mcp(user_id: str) -> MCPToolset:
+def composio_mcp(user_id: str) -> MCPToolset:
     if user_id not in cache:
         session = composio.create(user_id=user_id, toolkits=TOOLKITS)
         cache[user_id] = MCPToolset(session.mcp.url, headers=session.mcp.headers)
