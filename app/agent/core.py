@@ -1,5 +1,7 @@
 import os
 import asyncio
+from pathlib import Path
+from typing import Any
 from dotenv import load_dotenv
 
 from dataclasses import dataclass, field
@@ -46,27 +48,45 @@ model = OpenAIChatModel(
     ),
 )
 
+INSTRUCTIONS = (Path(__file__).parent / "instructions.md").read_text(encoding="utf-8")
+
 # Agent Configuration
 agent = Agent(
     model,
     deps_type=Session,
-    system_prompt="You are a helpful voice assistant. Keep replies short and conversational. Always confirm with the user before sending or deleting any email.",
+    system_prompt=INSTRUCTIONS,
 )
+
 
 
 @agent.system_prompt
 def inject_user_context(ctx: RunContext[Session]) -> str:
-    """Inject user profile (name, auth status) and relevant long-term memories."""
+    """
+    Inject user profile (name, age, location, attributes, auth status) and relevant long-term memories.
+    """
     prompts: list[str] = []
     profile = ctx.deps.profile
     name = profile.get("name")
+    age = profile.get("age")
+    location = profile.get("location")
+    custom_attrs = profile.get("custom_attributes", {})
     connected_apps = profile.get("connected_apps", {})
     active_tools = [app for app, active in connected_apps.items() if active]
 
+    user_info = []
     if name:
-        prompts.append(f"User's Name: {name}")
+        user_info.append(f"Name: {name}")
+    if age:
+        user_info.append(f"Age: {age}")
+    if location:
+        user_info.append(f"Location: {location}")
+    for k, v in custom_attrs.items():
+        user_info.append(f"{k.capitalize()}: {v}")
+
+    if user_info:
+        prompts.append(f"User Profile: {', '.join(user_info)}")
     else:
-        prompts.append("User's Name: Unknown (if the user shares their name, call the update_profile tool to save it).")
+        prompts.append("User Profile: Unknown (if user shares their name, age, location, or details, call update_profile to save them).")
 
     if active_tools:
         prompts.append(
@@ -87,29 +107,59 @@ def inject_user_context(ctx: RunContext[Session]) -> str:
     return "\n" + "\n".join(prompts) + "\n"
 
 
+
+
 @agent.tool
 async def update_profile(
     ctx: RunContext[Session],
     name: str | None = None,
+    age: int | None = None,
+    location: str | None = None,
     preference_key: str | None = None,
     preference_value: str | None = None,
+    custom_field: str | None = None,
+    custom_value: str | None = None,
 ) -> str:
     """
-    Update the user's profile in MongoDB when they provide their name or preferences.
+    Update the user's profile in MongoDB when they provide details about themselves.
+
+    Args:
+        name: User's name (e.g. "Ankith")
+        age: User's age as an integer (e.g. 25)
+        location: User's location/city/country (e.g. "Bengaluru, India")
+        preference_key: Specific preference category (e.g. "email_tone")
+        preference_value: Value for that preference (e.g. "concise")
+        custom_field: Any other attribute name (e.g. "occupation", "company", "hobbies")
+        custom_value: Value for that attribute (e.g. "Software Engineer")
     """
-    updates = {}
+    updates: dict[str, Any] = {}
+    profile = ctx.deps.profile
+
     if name:
-        ctx.deps.profile["name"] = name
+        profile["name"] = name
         updates["name"] = name
+    if age is not None:
+        profile["age"] = age
+        updates["age"] = age
+    if location:
+        profile["location"] = location
+        updates["location"] = location
     if preference_key and preference_value:
-        prefs = ctx.deps.profile.setdefault("preferences", {})
+        prefs = profile.setdefault("preferences", {})
         prefs[preference_key] = preference_value
         updates["preferences"] = prefs
+    if custom_field and custom_value:
+        attrs = profile.setdefault("custom_attributes", {})
+        cleaned_key = custom_field.strip().lower()
+        attrs[cleaned_key] = custom_value
+        updates[f"custom_attributes.{cleaned_key}"] = custom_value
 
     if updates:
         await update_user_profile(ctx.deps.user_id, updates)
         return f"Updated user profile with: {', '.join(updates.keys())}"
     return "No profile fields to update."
+
+
 
 
 @agent.tool
@@ -125,6 +175,8 @@ async def refresh_connected_apps(ctx: RunContext[Session]) -> str:
     return "No active integrations found."
 
 
+
+
 def trim(history: list[ModelMessage]) -> list[ModelMessage]:
     history = history[-MAX_MESSAGES:]
     while history and not (
@@ -135,11 +187,13 @@ def trim(history: list[ModelMessage]) -> list[ModelMessage]:
     return history
 
 
+
+
 async def run_agent(session_id: str, user_id: str, text: str) -> str:
-    # 1. Load persisted chat history from MongoDB (persists across server restarts & workers)
+    # 1. Load persisted chat history 
     history = await load_session_history(user_id, session_id)
 
-    # 2. Always fetch fresh user profile from MongoDB for this exact user_id
+    # 2. Fetch fresh user profile
     profile = await get_or_create_user_profile(user_id)
     if not profile.get("connected_apps"):
         profile["connected_apps"] = await sync_composio_connections(user_id)
@@ -179,4 +233,3 @@ async def run_agent(session_id: str, user_id: str, text: str) -> str:
     )
 
     return result.output
-
