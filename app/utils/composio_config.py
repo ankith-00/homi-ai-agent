@@ -5,7 +5,14 @@ from pydantic_ai.mcp import MCPToolset
 
 load_dotenv()
 
-TOOLKITS = ["gmail"]
+AVAILABLE_APPS = {
+    "gmail": "Gmail",
+    "googlecalendar": "Google Calendar",
+    "notion": "Notion",
+    "googledocs": "Google Docs",
+    "github": "GitHub",
+}
+TOOLKITS = list(AVAILABLE_APPS)
 
 composio = Composio(api_key=os.environ["COMPOSIO_API_KEY"])
 cache: dict[str, MCPToolset] = {}
