@@ -33,15 +33,6 @@ async def chat(body: ChatIn):
 
 
 
-# @app.post("/voice")
-# async def voice(
-#     session_id: str = Form(...),
-#     user_id: str = Form(...),
-#     audio: UploadFile = File(...),
-# ):
-#     text = await stt(await audio.read(), audio.filename or "audio.webm")
-#     reply = await run_agent(session_id, user_id, text)
-#     return Response(await tts(reply), media_type="audio/mpeg")
 
 @app.delete("/session/{session_id}")
 async def reset(session_id: str, user_id: str | None = None):
