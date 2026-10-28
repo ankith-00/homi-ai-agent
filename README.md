@@ -6,7 +6,7 @@
  ██╔══██║██║   ██║██║╚██╔╝██║██║
  ██║  ██║╚██████╔╝██║ ╚═╝ ██║██║
  ╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚═╝
- **Your personal AI, connected to your everyday apps.**
+ Your personal AI, connected to your everyday apps.
 </pre>
 
 ![Python](https://img.shields.io/badge/Python-3.14-3776AB?style=for-the-badge&logo=python&logoColor=white)
@@ -22,45 +22,65 @@
 
 ---
 
-## What is Homi?
-
-**Homi** is a production-ready, multi-user AI agent backend built with a modern Python stack. It acts as a smart personal assistant that remembers who you are across conversations, understands your preferences, and can take real actions on your behalf — like managing your Gmail, Notion, Github through deeply integrated third-party tools.
-
----
-
-## Capabilities
-
-| Feature | Description |
-| :--- | :--- |
-| **Conversational AI** | Engages in natural, context-aware conversations with short-term memory per session |
-| **Long-Term Memory** | Remembers user facts, preferences, and context across different sessions using Mem0 |
-| **User Profiles** | Builds and persists a rich profile per user (name, age, location, custom attributes) in MongoDB |
-|  **Tool Integrations** | Connects to real-world apps (Gmail,Notion, Github Calendar, and more) via Composio with OAuth support |
-| **Voice-Ready** | ElevenLabs TTS integration ready to convert agent replies to audio for voice interface support |
-
----
-
-## Architecture
-
+```json
+{
+    "What's Homi ?" :
+    "
+    Homi is a production-ready, multi-user AI agent backend built with a modern Python stack. It acts as a smart personal assistant that remembers who you are across conversations, understands your preferences, and can take real actions on your behalf like managing your Gmail, Notion, Github through deeply integrated third-party tools.
+    ",
+    "live_link" : "project-voi.vercel.app/project/ai-agent"
+}
 ```
-                ┌─────────────────────────────────────┐
-                │           FastAPI Server             │
-                │   POST /chat  DELETE /session        │
-                └────────────────┬────────────────────┘
-                                 │
-                    ┌────────────▼────────────┐
-                    │      Agent Core          │
-                    │   (pydantic-ai Agent)    │
-                    └─┬──────────┬────────────┘
-                      │          │
-          ┌───────────▼──┐  ┌────▼──────────────────┐
-          │  Mem0 Cloud   │  │     MongoDB Atlas      │
-          │  (Long-Term   │  │  ┌─────────────────┐  │
-          │   Memories)   │  │  │  user_profiles  │  │
-          └───────────────┘  │  ├─────────────────┤  │
-                             │  │  chat_sessions  │  │
-          ┌────────────────┐ │  │  (TTL: 48hrs)   │  │
-          │ Composio MCP   │ │  └─────────────────┘  │
-          │ (Gmail, etc.)  │ └───────────────────────┘
-          └────────────────┘
+
+<br/>
+
+```json
+[ Capabilities ]
+{
+  "conversational_ai": "Natural, context-aware conversations with short-term session memory",
+  "long_term_memory": "Remembers user facts, preferences, and context across sessions using Mem0",
+  "user_profiles": "Stores user details and custom attributes in MongoDB",
+  "tool_integrations": [
+    "Gmail",
+    "Notion",
+    "GitHub",
+    "Google Calendar"
+  ],
+  "integration_provider": "Composio with OAuth support",
+  "voice_ready": "ElevenLabs TTS integration for converting agent replies into audio"
+}
+```
+
+```text
+[ Architecture ]
+
+                 ┌────────────────────────┐
+                 │    FastAPI Server      │
+                 │  POST /chat            │
+                 │  DELETE /session       │
+                 └────────────┬───────────┘
+                              │
+                 ┌────────────▼───────────┐
+                 │      Agent Core        │
+                 │     Pydantic AI        │
+                 └────────────┬───────────┘
+                              │
+          ┌───────────────────┼───────────────────┐
+          │                   │                   │
+  ┌───────▼────────┐  ┌───────▼────────┐  ┌───────▼────────┐
+  │   Mem0 Cloud   │  │ MongoDB Atlas  │  │  Composio MCP  │
+  │  Long-term     │  │ user_profiles  │  │ Gmail, Notion  │
+  │  memory        │  │ chat_sessions  │  │ GitHub, etc.   │
+  └────────────────┘  │ TTL: 48 hours  │  └────────────────┘
+                      └────────────────┘
+                              │
+                 ┌────────────▼───────────┐
+                 │   Agent Response       │
+                 │  Generated Answer      │
+                 └────────────┬───────────┘
+                              │
+                 ┌────────────▼───────────┐
+                 │      Return to User    │
+                 │     JSON Response      │
+                 └────────────────────────┘
 ```
