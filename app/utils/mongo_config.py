@@ -125,7 +125,16 @@ async def get_or_create_user_profile(user_id: str) -> dict:
     """
     db = get_db()
     if db is None:
-        return {"_id": user_id, "name": None, "connected_apps": {}, "preferences": {}}
+        return {
+            "_id": user_id,
+            "name": None,
+            "email": None,
+            "age": None,
+            "location": None,
+            "connected_apps": {},
+            "preferences": {},
+            "custom_attributes": {},
+        }
 
     try:
         profile = await db.user_profiles.find_one({"_id": user_id})
@@ -135,8 +144,11 @@ async def get_or_create_user_profile(user_id: str) -> dict:
                 "_id": user_id,
                 "name": None,
                 "email": None,
+                "age": None,
+                "location": None,
                 "connected_apps": {},
                 "preferences": {},
+                "custom_attributes": {},
                 "created_at": now,
                 "updated_at": now,
             }
@@ -145,7 +157,16 @@ async def get_or_create_user_profile(user_id: str) -> dict:
         return profile
     except Exception as e:
         logger.error(f"Error in get_or_create_user_profile for {user_id}: {e}")
-        return {"_id": user_id, "name": None, "connected_apps": {}, "preferences": {}}
+        return {
+            "_id": user_id,
+            "name": None,
+            "email": None,
+            "age": None,
+            "location": None,
+            "connected_apps": {},
+            "preferences": {},
+            "custom_attributes": {},
+        }
 
 
 async def update_user_profile(user_id: str, updates: dict[str, Any]) -> dict | None:
