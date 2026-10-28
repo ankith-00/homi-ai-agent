@@ -1,5 +1,6 @@
 import os
 import logging
+import re
 from datetime import datetime, timezone
 from typing import Any
 from dotenv import load_dotenv
@@ -107,13 +108,44 @@ async def delete_session_history(session_id: str, user_id: str | None = None):
         logger.error(f"Error deleting session {session_id}: {e}")
 
 
+def _normalize_app_name(value: Any) -> str:
+    """Convert Composio toolkit values to clean app keys such as ``gmail``."""
+    slug = getattr(value, "slug", None)
+    if slug:
+        value = slug
+
+    name = str(value).strip().lower()
+    match = re.fullmatch(r"slug\s*=\s*['\"]([^'\"]+)['\"]", name)
+    if match:
+        return match.group(1).strip().lower()
+    return name
+
+
+def _normalize_connected_apps(apps: dict[str, bool]) -> dict[str, bool]:
+    normalized: dict[str, bool] = {}
+    for app_name, is_connected in apps.items():
+        clean_name = _normalize_app_name(app_name)
+        if clean_name:
+            normalized[clean_name] = normalized.get(clean_name, False) or is_connected
+    return normalized
+
+
 async def get_user_profile(user_id: str) -> dict | None:
     """Retrieve user profile document from MongoDB by user_id."""
     db = get_db()
     if db is None:
         return None
     try:
-        return await db.user_profiles.find_one({"_id": user_id})
+        profile = await db.user_profiles.find_one({"_id": user_id})
+        if profile and isinstance(profile.get("connected_apps"), dict):
+            connected_apps = _normalize_connected_apps(profile["connected_apps"])
+            if connected_apps != profile["connected_apps"]:
+                await db.user_profiles.update_one(
+                    {"_id": user_id},
+                    {"$set": {"connected_apps": connected_apps}},
+                )
+                profile["connected_apps"] = connected_apps
+        return profile
     except Exception as e:
         logger.error(f"Error fetching profile for {user_id}: {e}")
         return None
@@ -208,9 +240,11 @@ async def sync_composio_connections(user_id: str, composio_instance=None) -> dic
         )
         items = getattr(accounts, "items", []) or []
         for acc in items:
-            app_name = getattr(acc, "toolkit", None) or getattr(acc, "app_unique_id", None) or getattr(acc, "app_name", None)
+            app_name = getattr(acc, "toolkit", None)
+            if not app_name:
+                app_name = getattr(acc, "app_unique_id", None) or getattr(acc, "app_name", None)
             if app_name:
-                connected_apps[str(app_name).lower()] = True
+                connected_apps[_normalize_app_name(app_name)] = True
     except Exception as e:
         logger.warning(f"Could not fetch connected accounts from Composio for {user_id}: {e}")
 

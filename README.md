@@ -26,7 +26,10 @@
 {
     "What's Homi ?" :
     "
-    Homi is a production-ready, multi-user AI agent backend built with a modern Python stack. It acts as a smart personal assistant that remembers who you are across conversations, understands your preferences, and can take real actions on your behalf like managing your Gmail, Notion, Github through deeply integrated third-party tools.
+    Homi is a production-ready, multi-user AI agent backend built with a modern Python stack.
+    It acts as a smart personal assistant that remembers who you are across conversations,
+    understands your preferences, and can take real actions on your behalf like managing your Gmail,
+    Notion, Github through deeply integrated third-party tools.
     ",
     "live_link" : "project-voi.vercel.app/project/ai-agent"
 }
@@ -50,6 +53,7 @@
   "voice_ready": "ElevenLabs TTS integration for converting agent replies into audio"
 }
 ```
+<br>
 
 ```text
 [ Architecture ]

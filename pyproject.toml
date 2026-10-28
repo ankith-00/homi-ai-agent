@@ -14,3 +14,10 @@ dependencies = [
     "pydantic-ai>=2.60.0",
     "python-dotenv>=1.2.4",
 ]
+
+[project.scripts]
+homi-agent = "app.cli:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
