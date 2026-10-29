@@ -1,6 +1,6 @@
 from pydantic_ai import RunContext
 
-from ....utils.mongo_config import sync_composio_connections
+from ....mongodb import sync_composio_connections
 from ..context import Session
 
 

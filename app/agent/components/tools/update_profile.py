@@ -2,7 +2,7 @@ from typing import Any
 
 from pydantic_ai import RunContext
 
-from ....utils.mongo_config import update_user_profile
+from ....mongodb import update_user_profile
 from ..context import Session
 
 

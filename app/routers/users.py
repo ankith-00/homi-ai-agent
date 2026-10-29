@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app.utils.composio_config import composio
-from app.utils.mongo_config import get_user_profile, sync_composio_connections
+from app.mongodb import get_user_profile, sync_composio_connections
 
 router = APIRouter(tags=["users"])
 
