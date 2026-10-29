@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.utils.mem0_config import get_mem0_client
-from app.utils.mongo_config import get_db
+from app.mongodb import get_db
 
 router = APIRouter(tags=["health"])
 

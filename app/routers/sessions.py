@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.agent.core import sessions
-from app.utils.mongo_config import delete_session_history
+from app.mongodb import delete_session_history
 
 router = APIRouter(tags=["sessions"])
 

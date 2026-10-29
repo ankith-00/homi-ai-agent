@@ -23,6 +23,7 @@
 ---
 
 ```json
+[ Introduction ]
 {
     "What's Homi ?" :
     "
@@ -31,22 +32,8 @@
     understands your preferences, and can take real actions on your behalf like managing your Gmail,
     Notion, Github through deeply integrated third-party tools.
     ",
-    "live_link" : "project-voi.vercel.app/project/ai-agent"
+    "live_link" : "project-voi.vercel.app/project/homi-agent"
 }
-```
-
-## Run with Docker
-
-Create a `.env` file with the agent's required environment variables, then start the API:
-
-```bash
-docker compose up --build
-```
-
-The API is available at `http://localhost:8000`. To build the image without Compose:
-
-```bash
-docker build -t homi-agent:local .
 ```
 
 <br/>
@@ -67,6 +54,7 @@ docker build -t homi-agent:local .
   "voice_ready": "ElevenLabs TTS integration for converting agent replies into audio"
 }
 ```
+
 <br>
 
 ```text
@@ -102,10 +90,12 @@ docker build -t homi-agent:local .
                  │     JSON Response      │
                  └────────────────────────┘
 ```
+
 <br>
+``[ Screenshort - 01 ]``
 <img width="1461" height="860" alt="Screenshot 2026-10-29 014023" src="https://github.com/user-attachments/assets/724dfa05-99b1-47f9-9e3f-e288d29df9e2" />
 <br>
+<br>
+<br>
+``[ Screenshort - 02 ]``
 <img width="1452" height="861" alt="Screenshot 2026-10-29 014043" src="https://github.com/user-attachments/assets/eed3c816-9299-41ad-b1a7-de9eeb8b21d1" />
-
-
-

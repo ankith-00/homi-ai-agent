@@ -90,6 +90,8 @@ async def chat_stream(body: ChatIn):
             async for chunk in stream_agent(session_id, user_id, message):
                 if chunk.delta is not None:
                     yield f"event: delta\ndata: {json.dumps({'text': chunk.delta})}\n\n"
+                elif chunk.tool is not None:
+                    yield f"event: tool\ndata: {json.dumps(chunk.tool)}\n\n"
                 elif chunk.final is not None:
                     yield f"event: done\ndata: {json.dumps({'reply': chunk.final})}\n\n"
         except AgentBusyError as error:
