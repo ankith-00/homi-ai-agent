@@ -92,10 +92,10 @@
 ```
 
 <br>
-``[ Screenshort - 01 ]``
+[ Screenshort - 01 ]
 <img width="1461" height="860" alt="Screenshot 2026-10-29 014023" src="https://github.com/user-attachments/assets/724dfa05-99b1-47f9-9e3f-e288d29df9e2" />
 <br>
 <br>
 <br>
-``[ Screenshort - 02 ]``
+[ Screenshort - 02 ]
 <img width="1452" height="861" alt="Screenshot 2026-10-29 014043" src="https://github.com/user-attachments/assets/eed3c816-9299-41ad-b1a7-de9eeb8b21d1" />
