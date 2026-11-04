@@ -53,8 +53,9 @@ def inject_user_context(ctx: RunContext[Session]) -> str:
     if ctx.deps.relevant_memories:
         memories = "\n".join(f"- {memory}" for memory in ctx.deps.relevant_memories)
         prompts.append(
-            f"\n[Long-Term Memories about this user]:\n{memories}\n"
-            "Use these memories naturally to personalize responses when relevant."
+            f"\n[Recalled Memories - advisory, may be outdated]:\n{memories}\n"
+            "Use these memories naturally to personalize responses when relevant. "
+            "The User Profile above is authoritative: if a recalled memory conflicts with it, follow the User Profile."
         )
 
     return "\n" + "\n".join(prompts) + "\n"

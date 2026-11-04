@@ -18,3 +18,11 @@ wheels/
 compose.yaml
 Dockerfile
 .dockerignore
+
+
+# Docs
+OBSERVABILITY.md
+
+
+# Test
+tests/ 
