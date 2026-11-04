@@ -296,8 +296,6 @@ async def _stream_agent_impl(
     turn_span.set_attribute("homi.preparation_ms", preparation_ms)
     streamed_any = False
     first_text_seen = False
-    tool_call_count = 0
-    tool_started_at: dict[str, float] = {}
 
     logger.info(
         "Agent turn started turn=%s model=%s input=%s",
@@ -307,6 +305,8 @@ async def _stream_agent_impl(
     )
 
     for attempt in range(MODEL_RETRY_ATTEMPTS + 1):
+        tool_call_count = 0
+        tool_started_at: dict[str, float] = {}
         try:
             toolset = composio_mcp(user_id)
             logger.info("Opening agent run turn=%s attempt=%d toolset=Composio-MCP", turn_id, attempt + 1)
@@ -520,7 +520,18 @@ async def _stream_agent_impl(
                 err_details,
             )
             logger.exception("Transient model error turn=%s attempt=%d", turn_id, attempt + 1)
-            if streamed_any or attempt >= MODEL_RETRY_ATTEMPTS:
+            if streamed_any or tool_call_count > 0 or attempt >= MODEL_RETRY_ATTEMPTS:
+                if tool_call_count > 0:
+                    logger.error(
+                        "Not retrying turn=%s attempt=%d because %d tool call(s) already ran",
+                        turn_id,
+                        attempt + 1,
+                        tool_call_count,
+                    )
+                    raise AgentBusyError(
+                        "The request was interrupted after an action may have been performed. "
+                        "Please verify the result before trying again."
+                    ) from error
                 raise AgentBusyError(
                     "Homi Agent is busy right now. Please try again in a few seconds."
                 ) from error
