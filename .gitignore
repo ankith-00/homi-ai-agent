@@ -18,3 +18,7 @@ wheels/
 compose.yaml
 Dockerfile
 .dockerignore
+
+
+# Test
+tests/
