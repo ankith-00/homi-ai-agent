@@ -20,5 +20,9 @@ Dockerfile
 .dockerignore
 
 
+# Docs
+OBSERVABILITY.md
+
+
 # Test
 tests/
