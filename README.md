@@ -90,6 +90,52 @@
                  │     JSON Response      │
                  └────────────────────────┘
 ```
+<br>
+
+<br>
+
+```text
+[ Run Locally ]
+
+  Prerequisite: uv (the required Python 3.14 is installed automatically)
+
+  1. Clone the repository
+     $ git clone https://github.com/ankith-00/homi-ai-agent.git
+     $ cd homi-ai-agent
+
+  2. Install uv
+     # Windows (PowerShell)
+     $ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+     # macOS / Linux
+     $ curl -LsSf https://astral.sh/uv/install.sh | sh
+
+  3. Install dependencies
+     $ uv sync
+
+  4. Create a .env file in the project root and add your keys
+     AI_AGENT_API_KEY=
+     
+     NVIDIA_API_KEY=
+     NVIDIA_MODEL=
+     FALLBACK_MODEL=
+     MONGODB_URI=
+     MONGODB_DB_NAME=
+     MEM0_API_KEY=
+     MEM0_TELEMETRY=
+     COMPOSIO_API_KEY=
+     ELEVENLABS_API_KEY=
+     LOGFIRE_TOKEN=
+     
+     Required : AI_AGENT_API_KEY, NVIDIA_API_KEY, MONGODB_URI,
+                MONGODB_DB_NAME, MEM0_API_KEY, COMPOSIO_API_KEY
+     Optional : ELEVENLABS_API_KEY, LOGFIRE_TOKEN, FALLBACK_MODEL,
+                MEM0_TELEMETRY
+
+  5. Start the agent
+     $ uv run homi-agent --reload
+     API  : http://127.0.0.1:8000
+     Docs : http://127.0.0.1:8000/docs
+```
 
 <br>
 [ Screenshort - 01 ]
@@ -99,3 +145,16 @@
 <br>
 [ Screenshort - 02 ]
 <img width="1452" height="861" alt="Screenshot 2026-10-29 014043" src="https://github.com/user-attachments/assets/eed3c816-9299-41ad-b1a7-de9eeb8b21d1" />
+
+<br>
+
+```text
+[ License ]
+
+  MIT License
+  Copyright (c) 2026 ankith-00
+
+  This project is released under the MIT License.
+  See the LICENSE file for the full text.
+  https://opensource.org/licenses/MIT
+```
