@@ -1,6 +1,7 @@
 import os
 import logging
 import re
+import asyncio
 from datetime import datetime, timezone
 from typing import Any
 from dotenv import load_dotenv
@@ -222,9 +223,12 @@ async def update_user_profile(user_id: str, updates: dict[str, Any]) -> dict | N
         return None
 
 
-async def sync_composio_connections(user_id: str, composio_instance=None) -> dict[str, bool]:
+async def sync_composio_connections(user_id: str, composio_instance=None) -> dict[str, bool] | None:
     """
     Sync active Composio integrations for this user and cache them in MongoDB.
+
+    Returns the active app map, or None when Composio could not be reached
+    (in which case the cached value in MongoDB is left untouched).
     """
     if composio_instance is None:
         from .composio_config import composio
@@ -233,8 +237,10 @@ async def sync_composio_connections(user_id: str, composio_instance=None) -> dic
     connected_apps: dict[str, bool] = {}
 
     try:
-        # Check active connected accounts in Composio
-        accounts = composio_instance.connected_accounts.list(
+        # Check active connected accounts in Composio (SDK call is synchronous;
+        # run it in a worker thread so the async event loop stays responsive)
+        accounts = await asyncio.to_thread(
+            composio_instance.connected_accounts.list,
             user_ids=[user_id],
             statuses=["ACTIVE"],
         )
@@ -247,9 +253,9 @@ async def sync_composio_connections(user_id: str, composio_instance=None) -> dic
                 connected_apps[_normalize_app_name(app_name)] = True
     except Exception as e:
         logger.warning(f"Could not fetch connected accounts from Composio for {user_id}: {e}")
+        return None
 
-    # Cache the active apps in MongoDB
-    if connected_apps:
-        await update_user_profile(user_id, {"connected_apps": connected_apps})
+    # Cache the active apps in MongoDB (also when empty, so disconnects propagate)
+    await update_user_profile(user_id, {"connected_apps": connected_apps})
 
     return connected_apps

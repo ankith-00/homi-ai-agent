@@ -35,6 +35,20 @@
 }
 ```
 
+## Run with Docker
+
+Create a `.env` file with the agent's required environment variables, then start the API:
+
+```bash
+docker compose up --build
+```
+
+The API is available at `http://localhost:8000`. To build the image without Compose:
+
+```bash
+docker build -t homi-agent:local .
+```
+
 <br/>
 
 ```json
