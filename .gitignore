@@ -12,3 +12,9 @@ wheels/
 
 
 .mem0/
+
+
+# Docker Files
+compose.yaml
+Dockerfile
+.dockerignore
